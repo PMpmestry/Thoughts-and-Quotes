@@ -1,0 +1,71 @@
+SELECT
+    name,
+    DOB,
+    DOB + INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + 0 YEAR AS currbirthday,
+    DOB + INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + 1 YEAR AS nextbirthday
+FROM test_table
+ORDER BY CASE
+    WHEN currbirthday >= CURRENT_TIMESTAMP THEN currbirthday
+    ELSE nextbirthday
+END;
+
+
+SELECT
+    name,
+    DOB,
+    date(INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + '0 YEAR') as currbirthday,
+    date(INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + '1 YEAR') as nextbirthday
+FROM test_table
+ORDER BY CASE
+    WHEN DOB + INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + 0 YEAR >= CURRENT_TIMESTAMP THEN DOB + INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + 0 YEAR
+    ELSE DOB + INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(DOB)) + 1 YEAR
+END;
+
+SELECT
+    name,
+    DOB,
+    DOB + date(julianday(strftime('%Y',CURRENT_TIMESTAMP)) - julianday(strftime('%Y',DOB)) + '0 YEAR') as currbirthday,
+    DOB + date(julianday(strftime('%Y',CURRENT_TIMESTAMP)) - julianday(strftime('%Y',DOB)) + '1 YEAR') as nextbirthday
+FROM Customer
+ORDER BY CASE
+    WHEN currbirthday >= CURRENT_TIMESTAMP THEN currbirthday
+    ELSE nextbirthday
+END;
+
+
+SELECT
+    name,
+    DOB,
+    date(strftime('%Y', 'now','localtime')||strftime('-%m-%d', datetime((DOB/1000), 'unixepoch', 'localtime'))) as currbirthday,
+    date(strftime('%Y', 'now','localtime')||strftime('-%m-%d', datetime((DOB/1000), 'unixepoch', 'localtime'))+'1 YEAR') as nextbirthday
+FROM Customer
+ORDER BY CASE
+    WHEN currbirthday >= date('now') THEN currbirthday
+    ELSE nextbirthday
+END;
+
+---------------------------------------------correct one----------------------------------------------
+SELECT
+    name,
+    DOB,
+    date(strftime('%Y', 'now','localtime')||strftime('-%m-%d', DOB)) as currbirthday,
+    date(strftime('%Y', 'now','localtime')||strftime('-%m-%d', DOB),'+1 YEAR') as nextbirthday
+FROM Customer
+ORDER BY CASE
+    WHEN currbirthday >= date('now') THEN currbirthday
+    ELSE nextbirthday
+END;
+---------------------------------------------------------------
+
+
+----------------------DOA Sorting----------------------------------
+SELECT
+    name,
+    DOA,
+    date(strftime('%Y', 'now','localtime')||strftime('-%m-%d', DOA)) as currbirthday,
+    date(strftime('%Y', 'now','localtime')||strftime('-%m-%d', DOA),'+1 YEAR') as nextbirthday
+FROM Customer WHERE DOA IS NOT NULL
+ORDER BY CASE
+    WHEN currbirthday >= date('now') THEN currbirthday
+    ELSE nextbirthday 
+END;
